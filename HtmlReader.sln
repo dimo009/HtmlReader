@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.572
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HtmlReader", "HtmlReader\HtmlReader.csproj", "{9B8EFAC7-327F-484D-93AF-BD819C2E2664}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "urlReader", "urlReader\urlReader.csproj", "{A5A3B609-BC83-4330-9246-1D7E38C2916C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9B8EFAC7-327F-484D-93AF-BD819C2E2664}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B8EFAC7-327F-484D-93AF-BD819C2E2664}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B8EFAC7-327F-484D-93AF-BD819C2E2664}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9B8EFAC7-327F-484D-93AF-BD819C2E2664}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A5A3B609-BC83-4330-9246-1D7E38C2916C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A5A3B609-BC83-4330-9246-1D7E38C2916C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A5A3B609-BC83-4330-9246-1D7E38C2916C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A5A3B609-BC83-4330-9246-1D7E38C2916C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {AFB509FE-536A-4404-A772-05F252297C6D}
+	EndGlobalSection
+EndGlobal
