@@ -64,11 +64,9 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
-    <None Include="Resources\MasterFile.xlsx" />
-    <None Include="Resources\RedHat and Suse advisories.xlsx" />
-    <None Include="Resources\RedHat and Suse data from Qualys_01042019_30042019_RawData.xlsx" />
-    <None Include="Resources\RedHat security bulletins 01052019 - 31052019.xlsx" />
-    <None Include="Resources\Suse security bulletins 01052019-31052019.xlsx" />
+    <None Include="Resources\RedHat and Suse data from Qualys_01072019_31072019_RawData.xlsx" />
+    <None Include="Resources\RedHat security bulletins 01072019 - 31072019.xlsx" />
+    <None Include="Resources\Suse security bulletins 01072019-31072019.xlsx" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

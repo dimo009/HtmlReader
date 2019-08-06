@@ -24,6 +24,7 @@ namespace urlReader
             string redhatFilePath = Constants.Constants.redhatFile;
             string suseFilePath = Constants.Constants.suseFile;
 
+            // Creating two dictionaries which will store as Key: BulletinDI Value: HTML content for the KEY
             var dictRedHat = new Dictionary<string, string>();
             var dictSuse = new Dictionary<string, string>();
 
@@ -41,7 +42,7 @@ namespace urlReader
             dictSuse = CreateAndFillTheValuesForSuse(suseFile);
 
             FillRedHatFile(redhatFile, dictRedHat);
-            //FillSuseFile(suseFile, dictSuse);
+            FillSuseFile(suseFile, dictSuse);
 
 
 
@@ -88,7 +89,7 @@ namespace urlReader
                     {
                         
 
-                        if (item.StartsWith(" - SUSE"))
+                        if (item.StartsWith(" - SUSE") || item.StartsWith(" - OpenStack"))
                         {
                             
                             dictWithPackages.Add(item, new List<string>());
@@ -211,6 +212,8 @@ namespace urlReader
             return string.Join("|", parsedValues.Take(parsedValues.Length-1).Skip(1));
         }
 
+
+        //Getting the desired output
         private static void FillRedHatFile(FileInfo redhatFile, Dictionary<string, string> dictRedHat)
         {
             var dict = new Dictionary<string, Dictionary<string,List<string>>>();
@@ -223,6 +226,7 @@ namespace urlReader
                 int rows = rawData.Dimension.Rows;
 
 
+                //looping through the rows of the excel sheet
                 for (int i = 2; i <= rows; i++)
                 {
                     string bulletinId = Convert.ToString(rawData.Cells[i, 1].Value);
@@ -231,26 +235,24 @@ namespace urlReader
                     // Remove tab spaces
                     affectedPackages = affectedPackages.Replace("\t", " ");
 
-
-                    // Remove multiple white spaces from HTML
-                    //affectedPackages = Regex.Replace(affectedPackages, "\\s+", " ");
-
-
                     affectedPackages = Regex.Replace(affectedPackages, "<[^>]*>", "");
 
+                    //adding into list all parsed elements of the HTML
                     List<string> parsedValues = affectedPackages.Split(new string[] { "          ", "            ", "  ", "\t\t\t", "\n" }, StringSplitOptions.RemoveEmptyEntries).ToList();
                     parsedValues.RemoveAll(s => s.StartsWith("SHA-256: "));
-                    string outputValues = ComposeRedHatOutputForExcel(parsedValues);
+                    
 
                     string lastAddedKey = "";
                     string lastAddedVersion = "";
                    
+                   
                     Console.WriteLine($"Working on {bulletinId}");
 
-                    foreach (var item in parsedValues.Skip(1))
+                    //distribute the values from the List<string>parsedValues in a dictionary <string(Affected OS), Dictionary<string(architecture),List<string>>(package names for each architecture)
+                    foreach (var item in parsedValues.Skip(1)) //Skip the first one, becuase it is not relevant. The first record indicating the first affected OS is on position 1 of the list
                     {
 
-
+                        //all affected OS start with either Red Hat or JBoss Enterprise
                         if (item.StartsWith("Red Hat") || item.StartsWith("JBoss Enterprise"))
                         {
                             dict.Add(item, new Dictionary<string, List<string>>());
@@ -262,12 +264,14 @@ namespace urlReader
                             string versionName;
                             string componentName;
 
+                            //the length of the architecture name is always less than 10
                             if (item.Length<10)
                             {
                                 versionName = item;
                                 dict[lastAddedKey].Add(item, new List<string>());
                                 lastAddedVersion = item;
                             }
+                            //the name of the affected packages is always more than 10 elements and do not start with RedHat
                             else if (item.Length>10 && !item.StartsWith("Red Hat"))
                             {
                                 componentName = item;
@@ -278,7 +282,7 @@ namespace urlReader
                     }
 
                     
-                    
+                    //Printing the values for each bulletin, at the end the values in the dictionary are removed so that we start filling it in with the values of the next bulletin ID in the previous step
                     foreach (var item in dict)
                     {
                         string affectedProduct = item.Key;
@@ -310,11 +314,9 @@ namespace urlReader
             }
         }
 
-        private static string ComposeRedHatOutputForExcel(List<string> parsedValues)
-        {
-            return string.Join("|", parsedValues.Skip(1));
-        }
 
+
+        // Dictionary Key: BulletinID Value: Raw HTML content
         private static Dictionary<string, string> CreateAndFillTheValuesForSuse(FileInfo suseFile)
         {
             var dict = new Dictionary<string, string>();
@@ -365,6 +367,7 @@ namespace urlReader
             }
         }
 
+        // Dictionary Key: BulletinID Value: Raw HTML content
         private static Dictionary<string, string> CreateAndFillTHeValuesForRedHat(FileInfo redhatFile)
         {
             var dict = new Dictionary<string, string>();
@@ -390,19 +393,28 @@ namespace urlReader
                     using (StreamReader reader = new StreamReader(stream))
                     {
 
+                        try
+                        {
+                            html = reader.ReadToEnd();
 
-                        html = reader.ReadToEnd();
+                            HtmlDocument doc = new HtmlDocument();
+                            doc.LoadHtml(html);
+                            var textString = doc.DocumentNode.InnerHtml;
 
-                        HtmlDocument doc = new HtmlDocument();
-                        doc.LoadHtml(html);
-                        var textString = doc.DocumentNode.InnerHtml;
-
-                        int startIndex = textString.IndexOf(@"Click a package name for more details");
-                        int endIndex = textString.IndexOf(@"The Red Hat security contact is ");
-                        string coreString = textString.Substring(startIndex, endIndex - startIndex);
+                            int startIndex = textString.IndexOf(@"Click a package name for more details");
+                            int endIndex = textString.IndexOf(@"The Red Hat security contact is ");
+                            string coreString = textString.Substring(startIndex, endIndex - startIndex);
 
 
-                        dict.Add(bulletinId, coreString);
+                            dict.Add(bulletinId, coreString);
+                        }
+                        catch (Exception ae)
+                        {
+
+                            Console.WriteLine(ae.Message);
+                            Console.WriteLine(i);
+                        }
+                        
 
                     }
 
@@ -414,6 +426,7 @@ namespace urlReader
             return dict;
         }
 
+        //Convert the HTML content into plain text for easier string manipulations
         private static string HtmlToPlainText(string html)
         {
             const string tagWhiteSpace = @"(>|$)(\W|\n|\r)+<";//matches one or more (white space or line breaks) between '>' and '<'
